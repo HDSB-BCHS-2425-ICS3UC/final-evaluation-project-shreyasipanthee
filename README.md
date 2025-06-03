@@ -1,7 +1,11 @@
 # Conway's Game of Life
 
+---
+
 ## 🎮 Overview
-This is a simulation of **Conway's Game of Life**, a cellular automaton devised by John Conway. The game simulates the life and death of cells on a 10x10 grid according to specific rules.
+This is a simulation of **Conway's Game of Life**, a cellular automaton devised by John Conway. The game simulates the life and death of cells on a 10x10 grid 
+
+---
 
 ## 🧠 Game Rules
 Each cell on the grid is either alive or dead. In each generation:
@@ -9,10 +13,29 @@ Each cell on the grid is either alive or dead. In each generation:
 - A dead cell with exactly 3 live neighbours becomes alive.
 - All other cells die or remain dead.
 
-## 💻 How to Run the Game
-1. Make sure you have Python and 'pygame' installed.
-2. Run the game with: python main.py
-3. You will see a 10x10 grid with initial random cell states.
+---
+
+## 🚀 How to Run the Game
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/HDSB-BCHS-2425-ICS3UC/final-evaluation-project-shreyasipanthee.git
+   ```
+2. **Navigate to the project directory:**
+   ```bash
+   cd final-evaluation-project-shreyasipanthee
+   ```
+3. Make sure you have **Python** installed.
+4. **Install dependencies:**
+   ```bash
+   pip install pygame
+   ```
+5. **Run the game:**
+   ```bash
+   python main.py
+   ```
+6. You will see a 10x10 grid with initial random cell states.
+
+---
 
 ## 🕹️ Controls
 - Click on cells to toggle them between alive and dead (before starting).
@@ -20,6 +43,8 @@ Each cell on the grid is either alive or dead. In each generation:
 - Press **C** to clear the board.
 - Press **R** to randomize the grid.
 - Press **ESC** to exit the game.
+
+---
 
 ## Author
 
