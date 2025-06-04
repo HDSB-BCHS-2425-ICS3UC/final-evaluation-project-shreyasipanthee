@@ -1,24 +1,24 @@
 ```
 START
 
-## Introduction
+# Introduction
 PRINT "Welcome to Conway's Game of Life"
 PRINT "A simulation of cellular life and death based on mathematical rules."
 
-## Setup Grid
+# Setup Grid
 CREATE 10x10 grid → STORE as grid
 For each cell in grid 
     INITIALIZE state as DEAD
     STORE coordinates and size
     DRAW cell on screen using pygame functions
 
-## Define Cell Class
+# Define Cell Class
 DEFINE class Cell:
     INIT with x, y, size, and alive state
     METHOD draw() → Draw cell (alive = filled, dead = empty)
     METHOD toggle() → Switch alive/dead state
 
-#Main Game Loop
+# Main Game Loop
 SET simulation_running = FALSE
 WHILE game is running 
     LISTEN for pygame events:
@@ -43,7 +43,7 @@ WHILE game is running
     UPDATE display 
     DELAY to control simulation speed
 
-### Define update_grid(grid)
+# Define update_grid(grid)
 COPY current grid to a temporary grid temp_grid
 FOR each cell in grid:
     CALL count_alive_neighbours(cell)
@@ -56,14 +56,14 @@ FOR each cell in grid:
             SET cell to ALIVE
 RETURN updated grid
 
-### Define count_alive_neighbours(cell)
+# Define count_alive_neighbours(cell)
 SET alive_count = 0
 FOR each of the 8 surrounding positions:
     IF neighbour is within bounds and is ALIVE
         INCREMENT count
 RETURN count
 
-### Define draw_grid(grid)
+# Define draw_grid(grid)
 FOR each cell in grid:
     CALL cell.draw(screen)
 
