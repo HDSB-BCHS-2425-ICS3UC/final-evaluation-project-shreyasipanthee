@@ -1,3 +1,4 @@
+```
 START
 
 ## Introduction
@@ -67,3 +68,4 @@ FOR each cell in grid:
     CALL cell.draw(screen)
 
 END
+```
