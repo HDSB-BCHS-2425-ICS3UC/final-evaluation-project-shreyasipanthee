@@ -24,7 +24,7 @@ Each cell on the grid is either alive or dead. In each generation:
    ```bash
    cd final-evaluation-project-shreyasipanthee
    ```
-3. Make sure you have **Python** installed.
+3. Make sure you have `Python` installed.
 4. **Install dependencies:**
    ```bash
    pip install pygame
@@ -49,6 +49,8 @@ Each cell on the grid is either alive or dead. In each generation:
 ## 📘 Developer Documentation:
 - [Planning and Features](docs/PLANNING.md)
 - [Pseudocode](docs/PSEUDOCODE.md)
+
+---
 
 ## Author
 
