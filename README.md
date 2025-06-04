@@ -46,6 +46,10 @@ Each cell on the grid is either alive or dead. In each generation:
 
 ---
 
+## 📘 Developer Documentation:
+- [Planning and Features](docs/PLANNING.md)
+- [Pseudocode](docs/PSEUDOCODE.md)
+
 ## Author
 
 - **Shreyasi Panthee**
