@@ -15,20 +15,33 @@ print("2. Any live cell with two or three live neighbors lives on to the next ge
 print("3. Any live cell with more than three live neighbors dies (overpopulation).")
 print("4. Any dead cell with exactly three live neighbors becomes a live cell (reproduction).")
 
-pygame.init()
+grid_width = 10
+grid_height = 10
+cell_size = 50
+aspect_ratio = grid_width / grid_width
 
-# Screen Size
-# The screen size is 1800x1000 pixels
-screen_width, screen_height = 1250, 600
-screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
-pygame.display.set_caption("10x10 Grid")
+screen_width = grid_width * cell_size
+screen_height = grid_height * cell_size
 
 # Colors
 black = (0, 0, 0)
 white = (255, 255, 255)
 
-# Grid cell size
-cell_size = 60
+pygame.init()
+
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
+pygame.display.set_caption("Conway's Game of Life")
+
+game_surface = pygame.Surface((screen_width, screen_height))
+
+def draw_grid(surface, width, height, cell_size, color):
+    # Draw vertical lines
+    for x in range(0, width, cell_size):
+        pygame.draw.line(surface, color, (x, 0), (x, height))
+    
+    # Draw horizontal lines
+    for y in range(0, height, cell_size):
+        pygame.draw.line(surface, color, (0, y), (width, y))
 
 # Grid Size
 # The grid size is 10x10
@@ -40,15 +53,15 @@ while runnning:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             runnning = False
-    
-    screen.fill(black) # Fill the screen with black
-    # Draw grid lines
-    for row in range(grid_size):
-        for col in range(grid_size):
-            x = col * cell_size
-            y = row * cell_size
-            pygame.draw.rect(screen, white, (x, y, cell_size, cell_size), 1)
         
+        elif event.type == pygame.VIDEORESIZE:
+            # Maintain aspect ratio
+            new_width = event.w
+            new_height = int(new_width / aspect_ratio)
+            screen = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
+
+    screen.fill(black) # Fill the screen with black
+    draw_grid(screen, screen_width, screen_height, cell_size, white)    
     pygame.display.flip()  # Update the display
 
 pygame.quit()  # Quit the game
