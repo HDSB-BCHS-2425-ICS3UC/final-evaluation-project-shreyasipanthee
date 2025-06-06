@@ -52,6 +52,7 @@ Each cell on the grid is either alive or dead. In each generation:
 
 ---
 
-## Author
-
-- **Shreyasi Panthee**
+## 👨‍💻 Credits
+Developed by Shreyasi Panthee  
+Inspired by John Conway’s original Game of Life.  
+Assistance from AI (ChatGPT) was used for ...
