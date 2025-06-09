@@ -21,35 +21,39 @@ print("4. Any dead cell with exactly three live neighbors becomes a live cell (r
 grid_width = 10
 grid_height = 10
 cell_size = 50
-top_margin = 100 # Space for Grid header and buttons
+top_margin = 70 # Space for Grid header and buttons
 side_margin = 50
 
 # Calculate screen dimensions
 grid_pixel_width = grid_width * cell_size
 grid_pixel_height = grid_height * cell_size
-screen_width = grid_pixel_width + side_margin * 2
-screen_height = grid_pixel_height + top_margin + 50  # Adding space for the header
+screen_width = grid_pixel_width*2 + side_margin * 2
+screen_height = grid_pixel_height + top_margin + 70  # Adding space for the header
 
 # Colors
-black = (0, 0, 0)
+black = (0, 0, 15)
 white = (255, 255, 255)
+dark_blue = (0, 0, 50)
 
 pygame.init()
 
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
 pygame.display.set_caption("Conway's Game of Life")
-font = pygame.font.Font(None, 32)
+font = pygame.font.Font(None, 40)
+font_1 = pygame.font.Font(None, 30)
+font_2 = pygame.font.Font(None, 25)
 clock = pygame.time.Clock()
 
 # Grid and State Initialization
 grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
 simulation_running = False
 generation = 0
+grid_history = []
 
 def draw_grid(surface, cell_size, rows, cols, colour, offset_x, offset_y):
     # Draw vertical lines
     for col in range(cols + 1):
-        x= offset_x + col * cell_size
+        x = offset_x + col * cell_size
         pygame.draw.line(surface, colour, (x, offset_y), (x, offset_y + rows * cell_size))    
     # Draw horizontal lines
     for row in range(rows + 1):
@@ -89,35 +93,79 @@ def draw_button(surface, text, x, y, width, height):
     rect = pygame.Rect(x, y, width, height)
     pygame.draw.rect(surface, white, rect)
     pygame.draw.rect(surface, black, rect, 2)
-    label = font.render(text, True, black)
+    label = font_2.render(text, True, black)
     label_rect = label.get_rect(center=rect.center)
     surface.blit(label, label_rect)
     return rect
                 
 running = True
 while running:
-    screen.fill(black)  # Fill the screen with black
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    screen.fill(dark_blue)  # Fill the screen with black
 
     # Draw title
     title_text = font.render("Conway's Game of Life", True, white)
-    screen.blit(title_text, (screen_width - 425, 20))
-
-    # Draw generation count
-    generation_text = font.render("Generation: 0", True, white)
-    screen.blit(generation_text, (screen_width - 550, 70))
+    screen.blit(title_text, (screen_width - 460, 10))
 
     # Draw grid in center
     draw_grid(screen, cell_size, grid_height, grid_width, white, side_margin, top_margin)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        
-        elif event.type == pygame.VIDEORESIZE:
-            # Maintain aspect ratio
-            new_width = event.w
-            new_height = int(new_width / aspect_ratio)
-            screen = pygame.display.set_mode((new_width, new_height), pygame.RESIZABLE)
+    generation_text = font_1.render(f"Generation: {generation}", True, white)
+    screen.blit(generation_text, (side_margin, top_margin - 25))
+
+    # Draw buttons
+    start_button = draw_button(screen, "Start", side_margin + 10, top_margin + grid_pixel_height + 10, 80, 40)
+    stop_button = draw_button(screen, "Stop", side_margin + 110, top_margin + grid_pixel_height + 10, 80, 40)
+    next_button = draw_button(screen, "Next", side_margin + 210, top_margin + grid_pixel_height + 10, 80, 40)
+    restart_button = draw_button(screen, "Restart", side_margin + 310, top_margin + grid_pixel_height + 10, 80, 40)
+    previous_generation_button = draw_button(screen, "Previous", side_margin + 410, top_margin + grid_pixel_height + 10, 80, 40)
+
+    # If the user clicks on the grid, toggle the cell state
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.button == 1:  # Left mouse button
+            mouse_x, mouse_y = event.pos
+            if top_margin < mouse_y < top_margin + grid_pixel_height:
+                col = (mouse_x - side_margin) // cell_size
+                row = (mouse_y - top_margin) // cell_size
+                if 0 <= col < grid_width and 0 <= row < grid_height:
+                    grid[row][col].toggle()
+    # Drawing cells
+    draw_cells(screen)
+
+    # Handling button clicks
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        mouse_x, mouse_y = event.pos
+        if start_button.collidepoint(mouse_x, mouse_y):
+            simulation_running = True
+        elif stop_button.collidepoint(mouse_x, mouse_y):
+            simulation_running = False
+        elif next_button.collidepoint(mouse_x, mouse_y):
+            grid = next_generation()
+            generation += 1
+        elif restart_button.collidepoint(mouse_x, mouse_y):
+            # Reset the grid to the initial state
+            grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
+            generation = 0
+            simulation_running = False
+        elif previous_generation_button.collidepoint(mouse_x, mouse_y):
+            # Go back to the previous generation
+            if generation > 0:
+                generation -= 1
+                # Logic to restore the previous state can be added here
+
+
+    # Update the grid if the simulation is running
+    if simulation_running:
+        grid = next_generation()
+        generation += 1
+        clock.tick(10)
+
+    # Drawing the updated grid and cells
+    #draw_cells(screen)
+    #draw_grid(screen, cell_size, grid_height, grid_width, white, side_margin, top_margin)
+
 
     pygame.display.flip()  # Update the display
 
