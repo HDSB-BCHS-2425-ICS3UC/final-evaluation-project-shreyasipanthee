@@ -1,9 +1,13 @@
 # Author: Shreyasi Panthee
 # Date Modified: 2025-6-5
 # Description:
+#Implement better toggle function
+# Create menu for preexisting patterns
+# make new cells green, dead ones black, and alive since the previous generation or longer white and but it in a legend
+# for restart, start stop etc. buttons make them look like pause play fast forward etc. using both keys and mousclicks
+# move grid to center and make screen fuulscreen
 
 import pygame
-import sys
 from cell import Cell  
 
 # Introduction
@@ -67,7 +71,8 @@ def draw_cells(surface):
 
 def count_neighbors(r, c):
     count = 0
-    for dr in [-1, 0, 1]:
+    for dr in [-1, 0, 1]: # Row offsets: up, same, down
+        # Column offsets: left, same, right
         for dc in [-1, 0, 1]:
             if dr == 0 and dc == 0:
                 continue
@@ -116,11 +121,11 @@ while running:
     screen.blit(generation_text, (side_margin, top_margin - 25))
 
     # Draw buttons
-    start_button = draw_button(screen, "Start", side_margin + 10, top_margin + grid_pixel_height + 10, 80, 40)
-    stop_button = draw_button(screen, "Stop", side_margin + 110, top_margin + grid_pixel_height + 10, 80, 40)
-    next_button = draw_button(screen, "Next", side_margin + 210, top_margin + grid_pixel_height + 10, 80, 40)
-    restart_button = draw_button(screen, "Restart", side_margin + 310, top_margin + grid_pixel_height + 10, 80, 40)
-    previous_generation_button = draw_button(screen, "Previous", side_margin + 410, top_margin + grid_pixel_height + 10, 80, 40)
+     # Draw buttons with symbols
+    start_button = draw_button(screen, "▶" if not simulation_running else "||", side_margin, top_margin + grid_pixel_height + 20, 60, 40)
+    next_button = draw_button(screen, "⏭", side_margin + 70, top_margin + grid_pixel_height + 20, 60, 40)
+    reset_button = draw_button(screen, "🔄", side_margin + 140, top_margin + grid_pixel_height + 20, 60, 40)
+    prev_button = draw_button(screen, "⏮", side_margin + 210, top_margin + grid_pixel_height + 20, 60, 40)
 
     # If the user clicks on the grid, toggle the cell state
     if event.type == pygame.MOUSEBUTTONDOWN:
@@ -138,18 +143,16 @@ while running:
     if event.type == pygame.MOUSEBUTTONDOWN:
         mouse_x, mouse_y = event.pos
         if start_button.collidepoint(mouse_x, mouse_y):
-            simulation_running = True
-        elif stop_button.collidepoint(mouse_x, mouse_y):
-            simulation_running = False
+            simulation_running = not simulation_running  # Toggle simulation state
         elif next_button.collidepoint(mouse_x, mouse_y):
             grid = next_generation()
             generation += 1
-        elif restart_button.collidepoint(mouse_x, mouse_y):
+        elif reset_button.collidepoint(mouse_x, mouse_y):
             # Reset the grid to the initial state
             grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
             generation = 0
             simulation_running = False
-        elif previous_generation_button.collidepoint(mouse_x, mouse_y):
+        elif prev_button.collidepoint(mouse_x, mouse_y):
             # Go back to the previous generation
             if generation > 0:
                 generation -= 1
