@@ -1,9 +1,13 @@
 # Author: Shreyasi Panthee
 # Date Modified: 2025-6-5
 # Description:
+#Implement better toggle function
+# Create menu for preexisting patterns
+# make new cells green, dead ones black, and alive since the previous generation or longer white and but it in a legend
+# for restart, start stop etc. buttons make them look like pause play fast forward etc. using both keys and mousclicks
+# move grid to center and make screen fuulscreen
 
 import pygame
-import sys
 from cell import Cell  
 
 # Introduction
@@ -18,8 +22,7 @@ print("3. Any live cell with more than three live neighbors dies (overpopulation
 print("4. Any dead cell with exactly three live neighbors becomes a live cell (reproduction).")
 
 # Constants
-grid_width = 10
-grid_height = 10
+grid_width , grid_height = 10, 10
 cell_size = 50
 top_margin = 70 # Space for Grid header and buttons
 side_margin = 50
@@ -33,10 +36,10 @@ screen_height = grid_pixel_height + top_margin + 70  # Adding space for the head
 # Colors
 black = (0, 0, 15)
 white = (255, 255, 255)
-dark_blue = (0, 0, 50)
+dark_blue = (50, 0, 50)
+green = (0, 255, 0)
 
 pygame.init()
-
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
 pygame.display.set_caption("Conway's Game of Life")
 font = pygame.font.Font(None, 40)
@@ -49,22 +52,43 @@ grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
 simulation_running = False
 generation = 0
 grid_history = []
+click_handled = False
 
-def draw_grid(surface, cell_size, rows, cols, colour, offset_x, offset_y):
-    # Draw vertical lines
-    for col in range(cols + 1):
-        x = offset_x + col * cell_size
-        pygame.draw.line(surface, colour, (x, offset_y), (x, offset_y + rows * cell_size))    
-    # Draw horizontal lines
-    for row in range(rows + 1):
-        y = offset_y + row * cell_size
-        pygame.draw.line(surface, colour, (offset_x, y), (offset_x + cols * cell_size, y))
+# Drawing Functions
+def draw_grid(surface):
+    for col in range(grid_width + 1):
+        x = side_margin + col * cell_size
+        pygame.draw.line(surface, white, (x, top_margin), (x, top_margin + grid_height * cell_size))    
+    for row in range(grid_height + 1):
+        y = top_margin + row * cell_size
+        pygame.draw.line(surface, white, (side_margin, y), (side_margin + grid_width * cell_size, y))
 
 def draw_cells(surface):
     for row in grid:
         for cell in row:
-            cell.draw(surface, cell_size, top_margin, side_margin, white, black, white)
+            cell.draw(surface, cell_size, top_margin, side_margin, white, black, green)
 
+def draw_legend(surface):
+    legend_x = side_margin
+    legend_y = top_margin + grid_pixel_height + 80
+    pygame.draw.rect(surface, white, (legend_x, legend_y, 200, 100))
+    pygame.draw.rect(surface, black, (legend_x, legend_y, 200, 100), 2)
+    pygame.draw.rect(surface, green, (legend_x + 10, legend_y + 10, 20, 20))
+    pygame.draw.rect(surface, black, (legend_x + 10, legend_y + 40, 20, 20))
+    pygame.draw.rect(surface, white, (legend_x + 10, legend_y + 70, 20, 20))
+    surface.blit(font_2.render("New Cell", True, black), (legend_x + 40, legend_y + 10))
+    surface.blit(font_2.render("Dead Cell", True, black), (legend_x + 40, legend_y + 40))
+    surface.blit(font_2.render("Alive Cell", True, black), (legend_x + 40, legend_y + 70))
+
+def draw_button(surface, text, x, y, width, height):
+    rect = pygame.Rect(x, y, width, height)
+    pygame.draw.rect(surface, white, rect)
+    pygame.draw.rect(surface, black, rect, 2)
+    label = font_2.render(text, True, black)
+    surface.blit(label, label.get_rect(center=rect.center))
+    return rect
+
+# Game Logic
 def count_neighbors(r, c):
     count = 0
     for dr in [-1, 0, 1]:
@@ -84,89 +108,62 @@ def next_generation():
         for c in range(grid_width):
             alive_neighbors = count_neighbors(r, c)
             if grid[r][c].alive:
-                    new_grid[r][c].alive = alive_neighbors in [2, 3]  # Survive if 2 or 3 neighbors
+                new_grid[r][c].alive = alive_neighbors in [2, 3]
             else:
-                new_grid[r][c].alive = alive_neighbors == 3  # Become alive if exactly 3 neighbors
+                new_grid[r][c].alive = alive_neighbors == 3
     return new_grid
 
-def draw_button(surface, text, x, y, width, height):
-    rect = pygame.Rect(x, y, width, height)
-    pygame.draw.rect(surface, white, rect)
-    pygame.draw.rect(surface, black, rect, 2)
-    label = font_2.render(text, True, black)
-    label_rect = label.get_rect(center=rect.center)
-    surface.blit(label, label_rect)
-    return rect
+# Main loop
                 
 running = True
 while running:
+    screen.fill(dark_blue)
+    screen.blit(font.render("Conway's Game of Life", True, white), (screen_width - 460, 10))
+    screen.blit(font_1.render(f"Generation: {generation}", True, white), (side_margin, top_margin - 25))
+
+    draw_grid(screen)
+    draw_cells(screen)
+    draw_legend(screen)
+
+    start_button = draw_button(screen, "▶" if not simulation_running else "||", side_margin, top_margin + grid_pixel_height + 20, 60, 40)
+    next_button = draw_button(screen, "⏭", side_margin + 70, top_margin + grid_pixel_height + 20, 60, 40)
+    reset_button = draw_button(screen, "🔄", side_margin + 140, top_margin + grid_pixel_height + 20, 60, 40)
+    prev_button = draw_button(screen, "⏮", side_margin + 210, top_margin + grid_pixel_height + 20, 60, 40)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    screen.fill(dark_blue)  # Fill the screen with black
 
-    # Draw title
-    title_text = font.render("Conway's Game of Life", True, white)
-    screen.blit(title_text, (screen_width - 460, 10))
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                simulation_running = not simulation_running
+            elif event.key == pygame.K_RIGHT:
+                grid = next_generation()
+                generation += 1
+            elif event.key == pygame.K_UP:
+                grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
+                generation = 0
+            elif event.key == pygame.K_LEFT and generation > 0:
+                generation -= 1
+                # Future: grid = grid_history[generation]
 
-    # Draw grid in center
-    draw_grid(screen, cell_size, grid_height, grid_width, white, side_margin, top_margin)
-
-    generation_text = font_1.render(f"Generation: {generation}", True, white)
-    screen.blit(generation_text, (side_margin, top_margin - 25))
-
-    # Draw buttons
-    start_button = draw_button(screen, "Start", side_margin + 10, top_margin + grid_pixel_height + 10, 80, 40)
-    stop_button = draw_button(screen, "Stop", side_margin + 110, top_margin + grid_pixel_height + 10, 80, 40)
-    next_button = draw_button(screen, "Next", side_margin + 210, top_margin + grid_pixel_height + 10, 80, 40)
-    restart_button = draw_button(screen, "Restart", side_margin + 310, top_margin + grid_pixel_height + 10, 80, 40)
-    previous_generation_button = draw_button(screen, "Previous", side_margin + 410, top_margin + grid_pixel_height + 10, 80, 40)
-
-    # If the user clicks on the grid, toggle the cell state
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        if event.button == 1:  # Left mouse button
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_x, mouse_y = event.pos
             if top_margin < mouse_y < top_margin + grid_pixel_height:
                 col = (mouse_x - side_margin) // cell_size
                 row = (mouse_y - top_margin) // cell_size
                 if 0 <= col < grid_width and 0 <= row < grid_height:
                     grid[row][col].toggle()
-    # Drawing cells
-    draw_cells(screen)
+                    click_handled = True
 
-    # Handling button clicks
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        mouse_x, mouse_y = event.pos
-        if start_button.collidepoint(mouse_x, mouse_y):
-            simulation_running = True
-        elif stop_button.collidepoint(mouse_x, mouse_y):
-            simulation_running = False
-        elif next_button.collidepoint(mouse_x, mouse_y):
-            grid = next_generation()
-            generation += 1
-        elif restart_button.collidepoint(mouse_x, mouse_y):
-            # Reset the grid to the initial state
-            grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
-            generation = 0
-            simulation_running = False
-        elif previous_generation_button.collidepoint(mouse_x, mouse_y):
-            # Go back to the previous generation
-            if generation > 0:
-                generation -= 1
-                # Logic to restore the previous state can be added here
+        if event.type == pygame.MOUSEBUTTONUP:
+            click_handled = False
 
-
-    # Update the grid if the simulation is running
     if simulation_running:
         grid = next_generation()
         generation += 1
         clock.tick(10)
 
-    # Drawing the updated grid and cells
-    #draw_cells(screen)
-    #draw_grid(screen, cell_size, grid_height, grid_width, white, side_margin, top_margin)
+    pygame.display.flip()
 
-
-    pygame.display.flip()  # Update the display
-
-pygame.quit()  # Quit the game
+pygame.quit()
