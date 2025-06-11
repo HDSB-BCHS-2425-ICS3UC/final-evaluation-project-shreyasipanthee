@@ -214,10 +214,13 @@ while running:
 
         # Rules on the left
         draw_text_left("Blob Life Rules:", 2, 120, font)
-        draw_text_left("Lonely blob? It poofs! (0–1 friends)", 2, 180, font_2)
-        draw_text_left("Happy blob? It stays! (2–3 friends)", 2, 220, font_2)
-        draw_text_left("Crowded blob? It poofs! (4+ friends)", 2, 260, font_2)
-        draw_text_left("New blob? 3 nearby friends!", 2, 300, font_2)
+        draw_text_left("Lonely blob? It poofs!", 2, 180, font_2)
+        draw_text_left("(0–1 friends)", 2, 200, font_2)
+        draw_text_left("Happy blob? It stays!", 2, 225, font_2)
+        draw_text_left("(2–3 friends)", 2, 245, font_2)
+        draw_text_left("Crowded blob? It poofs!", 2, 270, font_2)
+        draw_text_left("(4+ friends)", 2, 290, font_2)
+        draw_text_left("New blob? 3 nearby friends!", 2, 315, font_2)
 
         if simulation_running:
             next_generation()
