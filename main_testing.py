@@ -53,7 +53,7 @@ blob_images = [
     pygame.transform.scale(pygame.image.load("assets/blob1.png"), (cell_size, cell_size)),
     pygame.transform.scale(pygame.image.load("assets/blob2.png"), (cell_size, cell_size))
 ]
-blobbo_img = pygame.image.load("assets/blobbo.png")
+blobbo_img = pygame.transform.scale(pygame.image.load("assets/blobbo.png"), (80, 80))
 play_img = pygame.image.load("assets/play.png")
 pause_img = pygame.image.load("assets/pause.png")
 fast_forward_img = pygame.image.load("assets/fast_forward.png")
@@ -67,9 +67,9 @@ blob_pop_sound = pygame.mixer.Sound("assets/pop.mp3")
 
 # Templates
 templates = {
-    "Heart": [(4,5), (5,4), (5,6), (6,3), (6,7), (7,3), (7,7), (8,4), (8,5), (8,6)],
+    "Letter A": [(4,5), (5,4), (5,6), (6,3), (6,7), (7,3), (7,7), (8,4), (7,5), (8,6)],
     "Smiley": [(4,3), (4,7), (6,4), (6,5), (6,6), (6,7)],
-    "Letter A": [(6,4), (5,3), (5,5), (4,2), (4,6), (3,2), (3,6), (2,3), (2,4), (2,5)]
+    "Heart": [(6,4), (5,3), (5,5), (4,2), (4,6), (3,2), (3,6), (2,3), (3,4), (2,5)]
 }
 
 # State
@@ -83,7 +83,7 @@ tutorial_step = 0
 tutorial_messages = [
     "Hi! I'm Blobbo. Let me teach you blob life!",
     "Click to place a blob!",
-    "Press ▶️ to watch your blobs grow!",
+    "Press spacebar to watch your blobs grow!",
     "Nice job! You're ready to play!"
 ]
 
@@ -100,11 +100,9 @@ def draw_text_left(text, x, y, font_obj, color=WHITE):
 def draw_cells(surface):
     for row in grid:
         for cell in row:
-            if cell.alive:
-                    image = random.choice(blob_images)
-                    surface.blit(image, (side_margin + cell.col * cell_size, top_margin + cell.row * cell_size))
+            if cell.alive and cell.image:
+                    surface.blit(cell.image, (side_margin + cell.col * cell_size, top_margin + cell.row * cell_size))
             pygame.draw.rect(surface, WHITE, (side_margin + cell.col * cell_size, top_margin + cell.row * cell_size, cell_size, cell_size), 1)
-
 def count_neighbors(r, c):
     count = 0
     for dr in [-1, 0, 1]:
@@ -124,19 +122,33 @@ def next_generation():
         for c in range(grid_width):
             neighbors = count_neighbors(r, c)
             if grid[r][c].alive:
-                new_grid[r][c].alive = neighbors in [2, 3]
+                alive_next = neighbors in [2, 3]
             else:
-                new_grid[r][c].alive = neighbors == 3
+                alive_next = neighbors == 3
+
+            new_grid[r][c].alive = alive_next
+
+            # Set image for alive cells, None for dead
+            if alive_next:
+                new_grid[r][c].image = random.choice(blob_images)  # Optional: random blob image for fun
+            else:
+                new_grid[r][c].image = None
+
+            # Play sound only if a new cell is born
             if new_grid[r][c].alive and not grid[r][c].alive:
                 blob_pop_sound.play()
+
+    # Update the global grid
     grid[:] = new_grid
     generation += 1
+
 
 def apply_template(name):
     global grid, generation
     grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
     for r, c in templates[name]:
         grid[r][c].alive = True
+        grid[r][c].image = random.choice(blob_images)  # Assign blob image here!
     generation = 0
 
 # --- Main Game Loop ---
@@ -165,7 +177,7 @@ while running:
                 col = (mx - side_margin) // cell_size
                 row = (my - top_margin) // cell_size
                 if 0 <= row < grid_height and 0 <= col < grid_width:
-                    grid[row][col].toggle()
+                    grid[row][col].toggle(blob_images)
                     blob_pop_sound.play()
         elif event.type == pygame.KEYDOWN:
             if screen_state == "simulation":
@@ -192,7 +204,7 @@ while running:
     elif screen_state == "tutorial":
         draw_text_centered("Blobbo Tutorial", 100, font)
         draw_text_centered(tutorial_messages[tutorial_step], 200, font_2)
-        screen.blit(blobbo_img, (screen_width // 2 - 40, 300))
+        screen.blit((blobbo_img) , (screen_width // 2 - 40, 300))
     elif screen_state == "simulation":
         draw_text_centered(f"Blob World: Generation {generation}", 40, font_1)
         progress = (generation % 20) * (screen_width // 20)
@@ -201,11 +213,11 @@ while running:
         draw_cells(screen)
 
         # Rules on the left
-        draw_text_left("Blob Life Rules:", 5, 120, font)
-        draw_text_left("Lonely blob? It poofs! (0–1 friends)", 5, 180, font_2)
-        draw_text_left("Happy blob? It stays! (2–3 friends)", 5, 220, font_2)
-        draw_text_left("Crowded blob? It poofs! (4+ friends)", 5, 260, font_2)
-        draw_text_left("New blob? 3 nearby friends!", 5, 300, font_2)
+        draw_text_left("Blob Life Rules:", 2, 120, font)
+        draw_text_left("Lonely blob? It poofs! (0–1 friends)", 2, 180, font_2)
+        draw_text_left("Happy blob? It stays! (2–3 friends)", 2, 220, font_2)
+        draw_text_left("Crowded blob? It poofs! (4+ friends)", 2, 260, font_2)
+        draw_text_left("New blob? 3 nearby friends!", 2, 300, font_2)
 
         if simulation_running:
             next_generation()
