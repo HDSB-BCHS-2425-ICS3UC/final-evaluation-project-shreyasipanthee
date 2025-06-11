@@ -39,6 +39,21 @@ white = (255, 255, 255)
 dark_blue = (50, 0, 50)
 green = (0, 255, 0)
 
+# === Images ===
+play_img = pygame.image.load("assets/play.png")
+pause_img = pygame.image.load("assets/pause.png")
+fast_forward_img = pygame.image.load("assets/fast_forward.png")
+prev_img = pygame.image.load("assets/prev.png")
+reset_img = pygame.image.load("assets/reset.png")
+
+# Resizing images
+button_size = (60,60)
+play_img = pygame.transform.scale(play_img, button_size)
+pause_img = pygame.transform.scale(pause_img, button_size)
+fast_forward_img = pygame.transform.scale(fast_forward_img, button_size)
+prev_img = pygame.transform.scale(prev_img, button_size)
+reset_img = pygame.transform.scale(reset_img, button_size)
+
 # === Pygame Setup ===
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
@@ -81,12 +96,9 @@ def draw_legend(surface):
     surface.blit(font_2.render("Dead Cell", True, black), (legend_x + 40, legend_y + 40))
     surface.blit(font_2.render("Alive Cell", True, black), (legend_x + 40, legend_y + 70))
 
-def draw_button(surface, text, x, y, width, height):
-    rect = pygame.Rect(x, y, width, height)
-    pygame.draw.rect(surface, white, rect)
-    pygame.draw.rect(surface, black, rect, 2)
-    label = font_2.render(text, True, black)
-    surface.blit(label, label.get_rect(center=rect.center))
+def draw_icon_button(surface, image, x, y):
+    rect = image.get_rect(topleft=(x, y))
+    surface.blit(image, rect)
     return rect
 
 # === Game Logic ===
@@ -126,11 +138,12 @@ while running:
     draw_cells(screen)
     draw_legend(screen)
 
-    start_button = draw_button(screen, "▶" if not simulation_running else "||", side_margin, top_margin + grid_pixel_height + 20, 60, 40)
-    next_button = draw_button(screen, "⏭", side_margin + 70, top_margin + grid_pixel_height + 20, 60, 40)
-    reset_button = draw_button(screen, "🔄", side_margin + 140, top_margin + grid_pixel_height + 20, 60, 40)
-    prev_button = draw_button(screen, "⏮", side_margin + 210, top_margin + grid_pixel_height + 20, 60, 40)
-
+    # Drawing buttons with images
+    start_button = draw_icon_button(screen, play_img if not simulation_running else pause_img, side_margin, top_margin + grid_pixel_height + 20)
+    next_button = draw_icon_button(screen, fast_forward_img, side_margin + 70, top_margin + grid_pixel_height + 20)
+    reset_button = draw_icon_button(screen, reset_img, side_margin + 140, top_margin + grid_pixel_height + 20)
+    prev_button = draw_icon_button(screen, prev_img, side_margin + 210, top_margin + grid_pixel_height + 20)
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -141,7 +154,7 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 grid = next_generation()
                 generation += 1
-            elif event.key == pygame.K_UP:
+            elif event.key == pygame.K_r:
                 grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
                 generation = 0
             elif event.key == pygame.K_LEFT and generation > 0:
