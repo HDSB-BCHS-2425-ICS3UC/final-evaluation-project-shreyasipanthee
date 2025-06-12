@@ -1,6 +1,9 @@
 # blob_life_game.py
-# Author: Shreyasi Panthee (updated with child-friendly blob features and animated start page)
-# Date Modified: 2025-06-11
+# Author: Shreyasi Panthee (updated with user-friendly blob features and animated start page)
+# Date Modified: 2025-06-12
+# Description: A fun version of Conway's Game of Life with animated blobs and a colorful theme.
+
+# ADD A RANDOMIZE GRID FUNCTION
 
 import pygame
 import random
@@ -321,6 +324,8 @@ while running:
         draw_cells()
         draw_back_button()
         draw_mute_button()
+        
+        # Draw the control instructions on the right side
         draw_text("Controls:", screen_width - 270, 120, font_2)
         draw_text("Space: Pause/Resume", screen_width - 270, 150, font_2)
         draw_text("R: Reset", screen_width - 270, 170, font_2)
@@ -332,12 +337,13 @@ while running:
         draw_text("S: Speed Up Generations", screen_width - 270, 290, font_2)
         draw_text("Mute/Unmute Music", screen_width - 270, 310, font_2)
         draw_text("Click to place blobs", screen_width - 270, 330, font_2)
+        
         # Rules on the left
         draw_text("Blob Life Rules:", 10, 120, font)
         draw_text("Lonely blob? It poofs!", 10, 180, font_2)
-        draw_text("(0–1 friends)", 10, 200, font_2)
+        draw_text("(0-1 friends)", 10, 200, font_2)
         draw_text("Happy blob? It stays!", 10, 225, font_2)
-        draw_text("(2–3 friends)", 10, 245, font_2)
+        draw_text("(2-3 friends)", 10, 245, font_2)
         draw_text("Crowded blob? It poofs!", 10, 270, font_2)
         draw_text("(4+ friends)", 10, 290, font_2)
         draw_text("New blob? 3 nearby friends!", 10, 315, font_2)
