@@ -105,6 +105,8 @@ for _ in range(30):
 
 # Timing variables for generation updates
 generation_interval = 500  # milliseconds between generations
+default_interval = 500
+fast_interval = 100
 last_update_time = pygame.time.get_ticks()
 
 # --- Helper Functions ---
@@ -113,14 +115,9 @@ def draw_text_centered(text, y, font_obj, color=WHITE):
     rect = rendered.get_rect(center=(screen_width // 2, y))
     screen.blit(rendered, rect)
 
-def draw_text_left(text, x, y, font_obj, color=WHITE):
+def draw_text(text, x, y, font_obj, color=WHITE):
     rendered = font_obj.render(text, True, color)
     screen.blit(rendered, (x, y))
-
-def draw_text_right(text, x, y, font_obj, color=WHITE):
-    rendered = font_obj.render(text, True, color)
-    rect = rendered.get_rect(right=x, centery=y)
-    screen.blit(rendered, rect)
 
 def draw_cells():
     for row in grid:
@@ -200,7 +197,7 @@ def animate_blobs():
             blob["y"] = random.randint(0, screen_height)
 
 def draw_back_button():
-    draw_text_left("<- Back", 20, 20, font_2)
+    draw_text("<- Back", 20, 20, font_2)
 
 
 # --- Main Game Loop ---
@@ -267,6 +264,9 @@ while running:
                     grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
                     generation = 0
                     simulation_running = False
+                elif event.key == pygame.K_RIGHT:
+                    if not simulation_running:
+                        next_generation()
                 elif event.key == pygame.K_1:
                     apply_template("Heart")
                 elif event.key == pygame.K_2:
@@ -297,36 +297,64 @@ while running:
 
     elif screen_state == "simulation":
         draw_text_centered(f"Generation: {generation}", 40, font_1)
-        pygame.draw.rect(screen, WHITE, (side_margin, 70, screen_width - 2 * side_margin, 10))
-        progress = (generation % 20) * (screen_width // 20)
-        pygame.draw.rect(screen, (255, 105, 180), (side_margin, 70, progress, 10))
+        # Constants for progress bar
+        bar_x = side_margin
+        bar_y = 70
+        bar_width = screen_width - 2 * side_margin
+        bar_height = 10
+
+        # Draw the background of the progress bar
+        pygame.draw.rect(screen, WHITE, (bar_x, bar_y, bar_width, bar_height))
+
+        # Compute progress: 1–20 fills the bar fully
+        # So gen 1 = 1/20 filled, gen 2 = 2/20 filled, ..., gen 20 = full bar
+        progress_position = generation % 20
+        if progress_position == 0 and generation != 0:
+            progress_position = 20  # Ensures gen 20 fills it completely
+
+        filled_width = int((progress_position / 20) * bar_width)
+
+        # Draw the filled part of the progress bar
+        pygame.draw.rect(screen, (255, 105, 180), (bar_x, bar_y, filled_width, bar_height))
+
+
         draw_cells()
         draw_back_button()
         draw_mute_button()
-        draw_text_right("Controls:", screen_width - 150, 20, font_2)
-        draw_text_right("Space: Pause/Resume", screen_width - 150, 50, font_2)
-        draw_text_right("R: Reset", screen_width - 150, 70, font_2)
-        draw_text_right("1: Heart Template", screen_width - 150, 90, font_2)
-        draw_text_right("2: Smiley Template", screen_width - 150, 110, font_2)
-        draw_text_right("3: Letter A Template", screen_width - 150, 130, font_2)
-        draw_text_right("Click to toggle blobs", screen_width - 150, 150, font_2)
-        draw_text_right("Mute/Unmute Music", screen_width - 150, 170, font_2)
-        draw_text_right("Click to place blobs", screen_width - 150, 190, font_2)
+        draw_text("Controls:", screen_width - 270, 120, font_2)
+        draw_text("Space: Pause/Resume", screen_width - 270, 150, font_2)
+        draw_text("R: Reset", screen_width - 270, 170, font_2)
+        draw_text("1: Heart Template", screen_width - 270, 190, font_2)
+        draw_text("2: Smiley Template", screen_width - 270, 210, font_2)
+        draw_text("3: Letter A Template", screen_width - 270, 230, font_2)
+        draw_text("Click to toggle blobs", screen_width - 270, 250, font_2)
+        draw_text("Right Arrow: Next Generation", screen_width - 270, 270, font_2)
+        draw_text("S: Speed Up Generations", screen_width - 270, 290, font_2)
+        draw_text("Mute/Unmute Music", screen_width - 270, 310, font_2)
+        draw_text("Click to place blobs", screen_width - 270, 330, font_2)
         # Rules on the left
-        draw_text_left("Blob Life Rules:", 2, 120, font)
-        draw_text_left("Lonely blob? It poofs!", 2, 180, font_2)
-        draw_text_left("(0–1 friends)", 2, 200, font_2)
-        draw_text_left("Happy blob? It stays!", 2, 225, font_2)
-        draw_text_left("(2–3 friends)", 2, 245, font_2)
-        draw_text_left("Crowded blob? It poofs!", 2, 270, font_2)
-        draw_text_left("(4+ friends)", 2, 290, font_2)
-        draw_text_left("New blob? 3 nearby friends!", 2, 315, font_2)
+        draw_text("Blob Life Rules:", 10, 120, font)
+        draw_text("Lonely blob? It poofs!", 10, 180, font_2)
+        draw_text("(0–1 friends)", 10, 200, font_2)
+        draw_text("Happy blob? It stays!", 10, 225, font_2)
+        draw_text("(2–3 friends)", 10, 245, font_2)
+        draw_text("Crowded blob? It poofs!", 10, 270, font_2)
+        draw_text("(4+ friends)", 10, 290, font_2)
+        draw_text("New blob? 3 nearby friends!", 10, 315, font_2)
 
-         # Update generations on interval only when simulation_running is True
+        # Check if 'S' is being held down for speed control
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_s]:
+            generation_interval = fast_interval  # Fast if S is held
+        else:
+            generation_interval = default_interval  # Normal otherwise
+
+        # Update generations based on the current interval
         current_time = pygame.time.get_ticks()
         if simulation_running and (current_time - last_update_time >= generation_interval):
             next_generation()
             last_update_time = current_time
+
 
     pygame.display.flip()
     clock.tick(60)
