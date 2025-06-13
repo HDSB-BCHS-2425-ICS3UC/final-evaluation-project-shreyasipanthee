@@ -1,3 +1,4 @@
+'''
 # blob_life_game.py
 # Author: Shreyasi Panthee (updated with child-friendly blob features)
 # Date Modified: 2025-06-11
@@ -230,3 +231,4 @@ while running:
     clock.tick(60)
 
 pygame.quit()
+'''

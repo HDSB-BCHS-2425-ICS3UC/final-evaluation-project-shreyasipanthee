@@ -4,6 +4,10 @@
 # Description: A fun version of Conway's Game of Life with animated blobs and a colorful theme.
 
 # ADD A RANDOMIZE GRID FUNCTION
+# ADD BUTTONS FOR FOR EVRYTHING SO YOU CAN SEE THE TEXT CLEARLY
+# MAKE SURE THAT THE GRID CLEAR WHEN YOU ENTER ANOTHER SCREEN AND THEN GO BACK TO PLAY (so if i go to the skip tutorial page and then go back and then choose to watch the tutorial the blobs that i had put on the play screen won't show up.)
+# ADD THE MUTE BUTTON TO EVERY SCREEN (# START_MENU)
+# ADD THE FLYING BLOBS TO THE CHOOSE TEMPLATE SCREEN
 
 import pygame
 import random
@@ -29,7 +33,7 @@ top_margin = 120
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-DARK_BLUE = (10, 10, 50)
+LIGHT_BLUE = (173, 216, 230)  # Light blue for the background
 PASTEL_PINK = (255, 204, 229)
 PASTEL_YELLOW = (255, 255, 204)
 PASTEL_GREEN = (204, 255, 204)
@@ -37,7 +41,7 @@ PASTEL_PURPLE = (229, 204, 255)
 
 # Themes
 themes = {
-    "Ocean": DARK_BLUE,
+    "Ocean": LIGHT_BLUE,
     "Candy": PASTEL_PINK,
     "Lemonade": PASTEL_YELLOW,
     "Meadow": PASTEL_GREEN,
@@ -71,8 +75,8 @@ blob_pop_sound = pygame.mixer.Sound("assets/button-click.mp3")
 
 # Templates
 templates = {
-    "Letter A": [(4,5), (5,4), (5,6), (6,3), (6,7), (7,3), (7,7), (8,4), (7,5), (8,6)],
-    "Smiley": [(4,3), (4,7), (6,4), (6,5), (6,6), (6,7)],
+    "Letter A": [(1,3), (1,4), (1,5), (1,6), (2,3), (2,6), (3,3), (3,4), (3,5), (3,6), (4,3), (4,6), (5,3), (5,6)],
+    "Smiley": [(7,4), (6,3), (7,5), (6,6), (5,2), (5,7), (2,3), (2,6), (3,3), (3,6), (1,3), (1,6)],
     "Heart": [(6,4), (5,3), (5,5), (4,2), (4,6), (3,2), (3,6), (2,3), (3,4), (2,5)]
 }
 
@@ -136,6 +140,18 @@ def draw_mute_button():
     text = font_2.render(label, True, WHITE)
     screen.blit(text, (mute_button_rect.x + 10, mute_button_rect.y + 10))
 
+def draw_button(text,rect, colour = (255, 255, 255)):
+    pygame.draw.rect(screen, colour, rect)
+    label = font_2.render(text, True, BLACK)
+    label_rect = label.get_rect(center=rect.center)
+    screen.blit(label, label_rect)
+
+def draw_template_button(text, rect, colour):
+    pygame.draw.rect(screen, colour, rect)
+    label = font_2.render(text, True, BLACK)
+    label_rect = label.get_rect(center=rect.center)
+    screen.blit(label, label_rect)
+
 def count_neighbors(r, c):
     count = 0
     for dr in [-1, 0, 1]:
@@ -177,6 +193,14 @@ def next_generation():
     grid[:] = new_grid
     generation += 1
 
+def randomize_grid():
+    global grid, generation
+    for row in grid:
+        for cell in row:
+            cell.alive = random.choice([True, False])
+            cell.image = random.choice(blob_images) if cell.alive else None
+    generation = 0
+
 def apply_template(name):
     global grid, generation
     grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
@@ -202,11 +226,28 @@ def animate_blobs():
 def draw_back_button():
     draw_text("<- Back", 20, 20, font_2)
 
+def all_blobs_dead():
+    return all(not cell.alive for row in grid for cell in row)
+
+def show_message_and_wait(message):
+    waiting = True
+    while waiting:
+        screen.fill(themes[current_theme])
+        draw_text_centered(message, screen_height // 2 - 30, font_1)
+        draw_text_centered("Click anywhere to reset", screen_height // 2 + 30, font_2)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                waiting = False
 
 # --- Main Game Loop ---
 running = True
 while running:
     screen.fill(themes[current_theme])
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -223,18 +264,18 @@ while running:
                         current_theme = theme
                         screen_state = "start_menu"
             elif screen_state == "start_menu":
-                if 200 <= event.pos[1] <= 240:
+                if tutorial_button_rect.collidepoint(mx, my):
                     screen_state = "tutorial"
-                elif 260 <= event.pos[1] <= 300:
+                elif storyline_button_rect.collidepoint(mx, my):
                     screen_state = "storyline"
-                elif 320 <= event.pos[1] <= 360:
+                elif play_button_rect.collidepoint(mx, my):
                     screen_state = "simulation"
                     # Reset grid when entering simulation
                     grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
                     generation = 0
                     simulation_running = False
 
-                elif 500 <= event.pos[1] <= 540:
+                elif theme_button_rect.collidepoint(mx, my):
                     screen_state = "theme_select"
             elif screen_state == "tutorial":
                 if tutorial_step < len(tutorial_messages) - 1:
@@ -264,6 +305,8 @@ while running:
                     simulation_running = not simulation_running
                     just_paused = not simulation_running  # Set to True only when you pause
                 elif event.key == pygame.K_r:
+                    randomize_grid()
+                elif event.key == pygame.K_LEFT:
                     grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
                     generation = 0
                     simulation_running = False
@@ -278,18 +321,26 @@ while running:
                     apply_template("Letter A")
 
     if screen_state == "theme_select":
+        animate_blobs()
         draw_text_centered("Choose Your Theme!", 100, font)
         for i, theme in enumerate(themes):
-            draw_text_centered(f"{i + 1}. {theme}", 180 + i * 40, font_2)
+            if themes[theme] == BLACK:
+                draw_template_button(theme, pygame.Rect(400, 180 + i * 40, 300, 40), (255,255,255))
+            else:
+                draw_template_button(theme, pygame.Rect(400, 180 + i * 40, 300, 40), themes[theme])
 
     elif screen_state == "start_menu":
         animate_blobs()
         draw_text_centered("Welcome to Blob Life!", 100, font)
         draw_text_centered("Game of Life with a Blob Twist!", 160, font_1)
-        draw_text_centered("[Play]", 200, font_2)
-        draw_text_centered("[Storyline]", 260, font_2)
-        draw_text_centered("[Skip Tutorial - Jump to Game]", 320, font_2)
-        draw_text_centered("<- Back to Themes", 500, font_2)
+        play_button_rect = pygame.Rect(400, 340, 300, 40)
+        tutorial_button_rect = pygame.Rect(400, 200, 300, 40)
+        storyline_button_rect = pygame.Rect(400, 270, 300, 40)
+        theme_button_rect = pygame.Rect(400, 410, 300, 40)
+        draw_button("Tutorial", tutorial_button_rect)
+        draw_button("Storyline", storyline_button_rect)
+        draw_button("Play", play_button_rect)
+        draw_button("Theme Select", theme_button_rect)
 
     elif screen_state == "tutorial":
         draw_text_centered("Blobbo Tutorial", 100, font)
@@ -359,6 +410,14 @@ while running:
         current_time = pygame.time.get_ticks()
         if simulation_running and (current_time - last_update_time >= generation_interval):
             next_generation()
+
+            if all_blobs_dead():
+                simulation_running = False
+                show_message_and_wait("Oh no! All the blobs have vanished!")
+                # Reset grid and generation
+                grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
+                generation = 0
+
             last_update_time = current_time
 
 
