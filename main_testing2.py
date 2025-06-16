@@ -3,15 +3,6 @@
 # Date Modified: 2025-06-12
 # Description: A fun version of Conway's Game of Life with animated blobs and a colorful theme.
 
-# ADD A RANDOMIZE GRID FUNCTION
-# ADD BUTTONS FOR FOR EVRYTHING SO YOU CAN SEE THE TEXT CLEARLY
-# MAKE SURE THAT THE GRID CLEAR WHEN YOU ENTER ANOTHER SCREEN AND THEN GO BACK TO PLAY (so if i go to the skip tutorial page and then go back and then choose to watch the tutorial the blobs that i had put on the play screen won't show up.)
-# ADD THE MUTE BUTTON TO EVERY SCREEN (# START_MENU)
-# ADD THE FLYING BLOBS TO THE CHOOSE TEMPLATE SCREEN
-
-#Storyline: "You're the Mayor of Blob Town! If a blob gets too lonely (0-1 friends), it disappears. If it gets too crowded (4+ friends), it poofs! But if 2-3 blobs are around, it's happy and stays! And if a patch of land has exactly 3 blobs nearby, a new baby blob is born!"
-
-
 import pygame
 import random
 from cell import Cell
@@ -93,7 +84,7 @@ templates = {
 }
 
 # State
-screen_state = "theme_select"
+screen_state = "start_page"
 grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
 simulation_running = False
 generation = 0
@@ -103,6 +94,9 @@ is_muted = False # mute state
 
 # Mute button dimensions
 mute_button_rect = pygame.Rect(screen_width - 120, 20, 100, 40)
+
+# Start button dimensions
+start_button_rect = pygame.Rect(screen_width//2 - 150, screen_height//2 +60 , 300, 50)
 
 # Tutorial messages
 tutorial_messages = [
@@ -152,6 +146,11 @@ def draw_mute_button():
     text = font_2.render(label, True, WHITE)
     screen.blit(text, (mute_button_rect.x + 10, mute_button_rect.y + 10))
 
+def draw_start_page():
+    animate_blobs()
+    draw_text_centered ("Welcome to Blob Life!", 120, font)
+    draw_text_centered("A silly game where blobs come to life!", 180, font_2)
+    draw_button("Start", start_button_rect)
 def draw_button(text,rect, colour = (255, 255, 255)):
     pygame.draw.rect(screen, colour, rect,border_radius=15)
     label = font_2.render(text, True, BLACK)
@@ -269,7 +268,7 @@ def draw_storyline_screen():
 
     # --- Draw the storyline text inside the box ---
     y = box_y + 50  # Start a bit below top of box
-    x_offset = 0    # Optional: move text slightly right
+    x_offset = 0   
     for i, line in enumerate(story_lines):
         font_used = font if i == 0 else font_2
         rendered = font_used.render(line, True, WHITE)
@@ -288,12 +287,24 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = pygame.mouse.get_pos()
+
+            # Handle mute button on any screen
+            if mute_button_rect.collidepoint(mx, my):
+                is_muted = not is_muted
+                if is_muted:
+                    pygame.mixer.music.set_volume(0)
+                else:
+                    pygame.mixer.music.set_volume(1)
+
             # Back button detection (top left corner)
-            if 20 <= mx <= 20 + 100 and 20 <= my <= 20 + 30:
+            elif 20 <= mx <= 20 + 100 and 20 <= my <= 20 + 30:
                 if screen_state in ["tutorial", "storyline", "simulation"]:
                     screen_state = "start_menu"
+            elif screen_state == "start_page":
+                if start_button_rect.collidepoint(mx,my):
+                    screen_state = "theme_select"
 
-            if screen_state == "theme_select":
+            elif screen_state == "theme_select":
                 y_offset = 180
                 for i, theme in enumerate(themes):
                     if y_offset + i * 40 <= event.pos[1] <= y_offset + (i+1) * 40:
@@ -327,16 +338,6 @@ while running:
                     generation = 0
                     simulation_running = False
 
-            elif screen_state == "simulation":
-                mx, my = event.pos
-                col = (mx - side_margin) // cell_size
-                row = (my - top_margin) // cell_size
-                if not simulation_running:
-                    if 0 <= row < grid_height and 0 <= col < grid_width:
-                        grid[row][col].toggle(blob_images)
-                        if not is_muted:
-                            blob_pop_sound.play()
-
                 # Mute button click detection
                 if mute_button_rect.collidepoint(mx, my):
                     is_muted = not is_muted
@@ -369,8 +370,14 @@ while running:
                     elif event.key == pygame.K_3:
                         apply_template("Letter A")
 
-    if screen_state == "theme_select":
+    if screen_state == "start_page":
+        draw_start_page()
         animate_blobs()
+        draw_mute_button()
+
+    elif screen_state == "theme_select":
+        animate_blobs()
+        draw_mute_button()
         draw_text_centered("Choose Your Theme!", 100, font)
         for i, theme in enumerate(themes):
             if themes[theme] == BLACK:
@@ -380,6 +387,7 @@ while running:
 
     elif screen_state == "start_menu":
         animate_blobs()
+        draw_mute_button()
         draw_text_centered("Welcome to Blob Life!", 100, font)
         draw_text_centered("Game of Life with a Blob Twist!", 160, font_1)
         play_button_rect = pygame.Rect(400, 340, 300, 40)
@@ -392,6 +400,7 @@ while running:
         draw_button("Theme Select", theme_button_rect)
 
     elif screen_state == "tutorial":
+        draw_mute_button()
         draw_text_centered("Blobbo Tutorial", 100, font)
         draw_text_centered(tutorial_messages[tutorial_step], 200, font_2)
         screen.blit(blobbo_img, (screen_width // 2 - 40, 300))
@@ -400,6 +409,8 @@ while running:
     
     elif screen_state == "storyline":
         draw_storyline_screen()
+        animate_blobs()
+        draw_mute_button()
         draw_back_button()
 
     elif screen_state == "simulation":
