@@ -9,6 +9,9 @@
 # ADD THE MUTE BUTTON TO EVERY SCREEN (# START_MENU)
 # ADD THE FLYING BLOBS TO THE CHOOSE TEMPLATE SCREEN
 
+#Storyline: "You're the Mayor of Blob Town! If a blob gets too lonely (0-1 friends), it disappears. If it gets too crowded (4+ friends), it poofs! But if 2-3 blobs are around, it's happy and stays! And if a patch of land has exactly 3 blobs nearby, a new baby blob is born!"
+
+
 import pygame
 import random
 from cell import Cell
@@ -33,9 +36,9 @@ top_margin = 120
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-LIGHT_BLUE = (173, 216, 230)  # Light blue for the background
+LIGHT_BLUE = (173, 216, 230) 
 PASTEL_PINK = (255, 204, 229)
-PASTEL_YELLOW = (255, 255, 204)
+PASTEL_YELLOW = (246,190,0)
 PASTEL_GREEN = (204, 255, 204)
 PASTEL_PURPLE = (229, 204, 255)
 
@@ -43,12 +46,26 @@ PASTEL_PURPLE = (229, 204, 255)
 themes = {
     "Ocean": LIGHT_BLUE,
     "Candy": PASTEL_PINK,
-    "Lemonade": PASTEL_YELLOW,
+    "Honey": PASTEL_YELLOW,
     "Meadow": PASTEL_GREEN,
     "Fairy": PASTEL_PURPLE,
     "None": BLACK
 }
 current_theme = "None"
+
+# Storyline screen content
+story_lines = [
+    "The Blob Life Story",
+    "",
+    "Once upon a time, a genius named Conway made",
+    "a grid where life grew using rules, not magic!",
+    "",
+    "Now blobs have taken over in this playful version!",
+    "They pop in, disappear, or stay—based on how",
+    "many blob buddies are around.",
+    "",
+    "It's Conway’s Game of Life... blobified!"
+]
 
 # Fonts
 font = pygame.font.Font(None, 50)
@@ -62,11 +79,6 @@ blob_images = [
     pygame.transform.scale(pygame.image.load("assets/blob2.png"), (cell_size, cell_size))
 ]
 blobbo_img = pygame.transform.scale(pygame.image.load("assets/blobbo.png"), (80, 80))
-play_img = pygame.image.load("assets/play.png")
-pause_img = pygame.image.load("assets/pause.png")
-fast_forward_img = pygame.image.load("assets/fast_forward.png")
-reset_img = pygame.image.load("assets/reset.png")
-prev_img = pygame.image.load("assets/prev.png")
 
 # Music and Sound
 pygame.mixer.music.load("assets/game-music.mp3")
@@ -135,13 +147,13 @@ def draw_cells():
 
 def draw_mute_button():
     color = (200, 0, 0) if is_muted else (0, 200, 0)
-    pygame.draw.rect(screen, color, mute_button_rect)
+    pygame.draw.rect(screen, color, mute_button_rect, border_radius=15)
     label = "Unmute" if is_muted else "Mute"
     text = font_2.render(label, True, WHITE)
     screen.blit(text, (mute_button_rect.x + 10, mute_button_rect.y + 10))
 
 def draw_button(text,rect, colour = (255, 255, 255)):
-    pygame.draw.rect(screen, colour, rect)
+    pygame.draw.rect(screen, colour, rect,border_radius=15)
     label = font_2.render(text, True, BLACK)
     label_rect = label.get_rect(center=rect.center)
     screen.blit(label, label_rect)
@@ -243,6 +255,29 @@ def show_message_and_wait(message):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 waiting = False
 
+def draw_storyline_screen():
+    screen.fill(themes[current_theme])
+
+    # --- Settings ---
+    box_x = 300  # Distance from left edge
+    box_y = 100   # Distance from top
+    box_width = screen_width - 10 * 60  # Width of rectangle
+    box_height = 450  # Height of the rectangle (adjust as needed)
+
+    # --- Draw the background box ---
+    pygame.draw.rect(screen, (30, 30, 30), (box_x, box_y, box_width, box_height), border_radius=15)
+
+    # --- Draw the storyline text inside the box ---
+    y = box_y + 50  # Start a bit below top of box
+    x_offset = 0    # Optional: move text slightly right
+    for i, line in enumerate(story_lines):
+        font_used = font if i == 0 else font_2
+        rendered = font_used.render(line, True, WHITE)
+        rect = rendered.get_rect(center=(screen_width // 2 + x_offset, y))
+        screen.blit(rendered, rect)
+        y += 40
+
+
 # --- Main Game Loop ---
 running = True
 while running:
@@ -257,12 +292,14 @@ while running:
             if 20 <= mx <= 20 + 100 and 20 <= my <= 20 + 30:
                 if screen_state in ["tutorial", "storyline", "simulation"]:
                     screen_state = "start_menu"
+
             if screen_state == "theme_select":
                 y_offset = 180
                 for i, theme in enumerate(themes):
                     if y_offset + i * 40 <= event.pos[1] <= y_offset + (i+1) * 40:
                         current_theme = theme
                         screen_state = "start_menu"
+
             elif screen_state == "start_menu":
                 if tutorial_button_rect.collidepoint(mx, my):
                     screen_state = "tutorial"
@@ -277,19 +314,28 @@ while running:
 
                 elif theme_button_rect.collidepoint(mx, my):
                     screen_state = "theme_select"
+            elif screen_state == "storyline":
+                screen_state = "start_menu"
+
             elif screen_state == "tutorial":
                 if tutorial_step < len(tutorial_messages) - 1:
                     tutorial_step += 1
                 else:
                     screen_state = "simulation"
+                    # Reset grid when tutorial ends
+                    grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
+                    generation = 0
+                    simulation_running = False
+
             elif screen_state == "simulation":
                 mx, my = event.pos
                 col = (mx - side_margin) // cell_size
                 row = (my - top_margin) // cell_size
-                if 0 <= row < grid_height and 0 <= col < grid_width:
-                    grid[row][col].toggle(blob_images)
-                    if not is_muted:
-                        blob_pop_sound.play()
+                if not simulation_running:
+                    if 0 <= row < grid_height and 0 <= col < grid_width:
+                        grid[row][col].toggle(blob_images)
+                        if not is_muted:
+                            blob_pop_sound.play()
 
                 # Mute button click detection
                 if mute_button_rect.collidepoint(mx, my):
@@ -301,24 +347,27 @@ while running:
 
         elif event.type == pygame.KEYDOWN:
             if screen_state == "simulation":
+                
                 if event.key == pygame.K_SPACE:
                     simulation_running = not simulation_running
                     just_paused = not simulation_running  # Set to True only when you pause
-                elif event.key == pygame.K_r:
-                    randomize_grid()
-                elif event.key == pygame.K_LEFT:
-                    grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
-                    generation = 0
-                    simulation_running = False
-                elif event.key == pygame.K_RIGHT:
-                    if not simulation_running:
-                        next_generation()
-                elif event.key == pygame.K_1:
-                    apply_template("Heart")
-                elif event.key == pygame.K_2:
-                    apply_template("Smiley")
-                elif event.key == pygame.K_3:
-                    apply_template("Letter A")
+                
+                if not simulation_running:
+                    if event.key == pygame.K_r:
+                        randomize_grid()
+                    elif event.key == pygame.K_LEFT:
+                        grid = [[Cell(r, c) for c in range(grid_width)] for r in range(grid_height)]
+                        generation = 0
+                        simulation_running = False
+                    elif event.key == pygame.K_RIGHT:
+                        if not simulation_running:
+                            next_generation()
+                    elif event.key == pygame.K_1:
+                        apply_template("Heart")
+                    elif event.key == pygame.K_2:
+                        apply_template("Smiley")
+                    elif event.key == pygame.K_3:
+                        apply_template("Letter A")
 
     if screen_state == "theme_select":
         animate_blobs()
@@ -347,6 +396,10 @@ while running:
         draw_text_centered(tutorial_messages[tutorial_step], 200, font_2)
         screen.blit(blobbo_img, (screen_width // 2 - 40, 300))
         draw_text_centered("Click to continue tutorial", 450, font_2)
+        draw_back_button()
+    
+    elif screen_state == "storyline":
+        draw_storyline_screen()
         draw_back_button()
 
     elif screen_state == "simulation":
@@ -379,15 +432,16 @@ while running:
         # Draw the control instructions on the right side
         draw_text("Controls:", screen_width - 270, 120, font_2)
         draw_text("Space: Pause/Resume", screen_width - 270, 150, font_2)
-        draw_text("R: Reset", screen_width - 270, 170, font_2)
-        draw_text("1: Heart Template", screen_width - 270, 190, font_2)
-        draw_text("2: Smiley Template", screen_width - 270, 210, font_2)
-        draw_text("3: Letter A Template", screen_width - 270, 230, font_2)
-        draw_text("Click to toggle blobs", screen_width - 270, 250, font_2)
-        draw_text("Right Arrow: Next Generation", screen_width - 270, 270, font_2)
-        draw_text("S: Speed Up Generations", screen_width - 270, 290, font_2)
-        draw_text("Mute/Unmute Music", screen_width - 270, 310, font_2)
-        draw_text("Click to place blobs", screen_width - 270, 330, font_2)
+        draw_text("R: Randomize", screen_width - 270, 170, font_2)
+        draw_text("Left Arrow: Reset Grid", screen_width - 270, 190, font_2)
+        draw_text("1: Heart Template", screen_width - 270, 210, font_2)
+        draw_text("2: Smiley Template", screen_width - 270, 230, font_2)
+        draw_text("3: Letter A Template", screen_width - 270, 250, font_2)
+        draw_text("Click to toggle blobs", screen_width - 270, 270, font_2)
+        draw_text("Right Arrow: Next Generation", screen_width - 270, 290, font_2)
+        draw_text("S: Speed Up Generations", screen_width - 270, 310, font_2)
+        draw_text("Mute/Unmute Music", screen_width - 270, 330, font_2)
+        draw_text("Click to place blobs", screen_width - 270, 360, font_2)
         
         # Rules on the left
         draw_text("Blob Life Rules:", 10, 120, font)
