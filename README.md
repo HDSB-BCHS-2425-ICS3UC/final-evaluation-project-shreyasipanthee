@@ -7,7 +7,7 @@
 
 ---
 
-## 🧠 Game Rules (Simplified for Kids)  
+## 🧠 Game Rules  
 Each square (cell) can either have a **blob** or be **empty**. Every round (generation):  
 - A lonely blob (0–1 friends) disappears.  
 - A happy blob (2–3 friends) survives!  
@@ -74,7 +74,7 @@ Each square (cell) can either have a **blob** or be **empty**. Every round (gene
 ## Sources
 
 ### ChatGPT Conversations Used
-1. [Conversation on 2025-06-12: Commenting and event handling help](https://chatgpt.com/share/684afe12-cc60-800d-9b25-747aca1084dd)
+1. [Conversation on 2025-06-12: Commenting and event handling help](https://chatgpt.com/share/6851ae22-75ac-800d-bad2-e87ff2ec0c97)
 2. [Conversation on 2025-06-13: Mute button and UI improvements](https://chatgpt.com/share/68519576-06ec-800d-9f48-ce1a3654b6c8)
 
 *Note: These conversations provided coding support and suggestions for this project.*
