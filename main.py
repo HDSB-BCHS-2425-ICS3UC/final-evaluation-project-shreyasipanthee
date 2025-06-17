@@ -95,6 +95,7 @@ is_muted = False # mute state
 # === UI ELEMENTS ===
 mute_button_rect = pygame.Rect(screen_width - 120, 20, 100, 40)
 start_button_rect = pygame.Rect(screen_width//2 - 150, screen_height//2 +60 , 300, 50)
+back_button_rect = pygame.Rect(20, 20, 100, 30)  # Back button in the top left corner
 
 # === TUTORIAL ===
 tutorial_messages = [
@@ -163,7 +164,12 @@ def draw_template_button(text, rect, colour):
     screen.blit(label, label_rect)
 
 def draw_back_button():
-    draw_text("<- Back", 20, 20, font_2)
+    rect = pygame.Rect(20, 20, 100, 30)  # x, y, width, height
+    colour = (255, 255, 255)  # White background
+    pygame.draw.rect(screen, colour, rect, border_radius=15)
+    label = font_2.render("Back", True, (0, 0, 0))  # Black text
+    label_rect = label.get_rect(center=rect.center)
+    screen.blit(label, label_rect)
 
 # === GAME LOGIC ===
 def count_neighbors(r, c):
@@ -312,7 +318,7 @@ while running:
                 pygame.mixer.music.set_volume ((0 if is_muted else 1))  # Mute or unmute music
 
             # Detect click on the back button (top left corner)
-            elif 20 <= mx <= 120 and 20 <= my <= 50:
+            elif back_button_rect.collidepoint(mx, my):
                 if screen_state in ["tutorial", "storyline", "simulation"]:
                     screen_state = "start_menu"
 
