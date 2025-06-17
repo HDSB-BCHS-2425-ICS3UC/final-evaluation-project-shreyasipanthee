@@ -2,70 +2,81 @@
 START
 
 # Introduction
-PRINT "Welcome to Conway's Game of Life"
-PRINT "A simulation of cellular life and death based on mathematical rules."
+PRINT "Welcome to Blob Life"
+PRINT "A fun, colorful version of Conway's Game of Life!"
 
-# Setup Grid
-CREATE 10x10 grid → STORE as grid
-For each cell in grid 
-    INITIALIZE state as DEAD
-    STORE coordinates and size
-    DRAW cell on screen using pygame functions
+# Initialize
+IMPORT pygame and other modules
+SETUP screen, clock, constants (width, height, grid size, etc.)
+LOAD fonts, images, sounds
 
-# Define Cell Class
-DEFINE class Cell:
-    INIT with x, y, size, and alive state
-    METHOD draw() → Draw cell (alive = filled, dead = empty)
-    METHOD toggle() → Switch alive/dead state
+# Define Cell class
+CLASS Cell:
+    INIT(row, col, size)
+        SET alive = False
+    METHOD toggle()
+        SWITCH alive/dead state
+    METHOD draw(screen)
+        DRAW filled blob if alive, outline if dead
 
-# Main Game Loop
-SET simulation_running = FALSE
-WHILE game is running 
-    LISTEN for pygame events:
-        If event is QUIT
-            END program
-        IF event is MOUSE CLICK
-            GET cell at clicked position → CALL toggle() function
-        IF event KEY PRESS:
-            IF key is SPACE
+# Create Grid
+MAKE 2D list of Cell objects
+
+# Game State
+SET screen_state = "start_page"
+SET simulation_running = False
+SET generation = 0
+
+# Main Loop
+WHILE game is running:
+    HANDLE events:
+        IF quit event:
+            EXIT
+        IF mouse click:
+            IF on start button:
+                screen_state = "start_menu"
+            IF in grid and simulation not running:
+                TOGGLE cell at click
+        IF key press:
+            IF SPACE:
                 TOGGLE simulation_running
-            IF key is C
-                SET all cells to DEAD
-            IF key is R
-                RANDOMIZE cell states
-            IF key is ESC
-                END program
+            IF R and not running:
+                RANDOMIZE grid
+            IF LEFT ARROW and not running:
+                CLEAR grid
+            IF RIGHT ARROW and not running:
+                STEP one generation
 
-    IF simulation_running is TRUE
-        CALL update_grid(grid) → APPLY Game of Life Rules
+    IF simulation_running:
+        UPDATE grid using next_generation()
 
-    CALL draw_grid(grid) → DISPLAY updated grid 
-    UPDATE display 
-    DELAY to control simulation speed
+    DRAW screen based on screen_state:
+        IF start_page:
+            SHOW animated blobs and title
+        IF start_menu:
+            SHOW buttons for Play and Tutorial
+        IF tutorial:
+            DISPLAY next tutorial message each click
+        IF simulation:
+            DRAW grid and instructions
 
-# Define update_grid(grid)
-COPY current grid to a temporary grid temp_grid
+    UPDATE screen
+    DELAY for frame rate
+
+# next_generation()
+COPY grid to temp_grid
 FOR each cell in grid:
-    CALL count_alive_neighbours(cell)
+    COUNT alive neighbours
     APPLY rules:
-        IF cell is ALIVE and (neighbors < 2 or neighbors > 3):
-            SET cell to DEAD
-        IF cell is ALIVE and (neighbors == 2 or 3):
-            KEEP cell ALIVE
-        IF cell is DEAD and (neighbors == 3):
-            SET cell to ALIVE
+        - Alive + <2 or >3 neighbours → die
+        - Alive + 2 or 3 neighbours → live
+        - Dead + exactly 3 neighbours → become alive
 RETURN updated grid
 
-# Define count_alive_neighbours(cell)
-SET alive_count = 0
-FOR each of the 8 surrounding positions:
-    IF neighbour is within bounds and is ALIVE
-        INCREMENT count
+# count_alive_neighbours(cell)
+CHECK 8 surrounding cells
+COUNT how many are alive
 RETURN count
-
-# Define draw_grid(grid)
-FOR each cell in grid:
-    CALL cell.draw(screen)
 
 END
 ```
