@@ -1,58 +1,88 @@
-# Conway's Game of Life
+# 🧬 Blob Life: A Friendly Twist on Conway's Game of Life
 
 ---
 
-## 🎮 Overview
-This is a simulation of **Conway's Game of Life**, a cellular automaton devised by John Conway. The game simulates the life and death of cells on a 10x10 grid 
+## 🎮 Overview  
+**Blob Life** is a child-friendly, interactive simulation based on **Conway's Game of Life**, reimagined with colorful blobs, animations, themed backgrounds, sound effects, and a guided tutorial featuring Blobbo the blob. Designed to be intuitive for even a 5-year-old, it's both educational and fun!
 
 ---
 
-## 🧠 Game Rules
-Each cell on the grid is either alive or dead. In each generation:
-- A live cell with 2 or 3 neighbours stays alive.
-- A dead cell with exactly 3 live neighbours becomes alive.
-- All other cells die or remain dead.
+## 🧠 Game Rules  
+Each square (cell) can either have a **blob** or be **empty**. Every round (generation):  
+- A lonely blob (0–1 friends) disappears.  
+- A happy blob (2–3 friends) survives!  
+- A crowded blob (4+ friends) disappears.  
+- A new blob appears where there are **exactly 3 blob friends** nearby.  
 
 ---
 
-## 🚀 How to Run the Game
-1. **Clone the repository:**
+## 🚀 How to Run the Game  
+1. **Clone the repository:**  
    ```bash
    git clone https://github.com/HDSB-BCHS-2425-ICS3UC/final-evaluation-project-shreyasipanthee.git
    ```
-2. **Navigate to the project directory:**
+
+2. **Navigate to the project directory:**  
    ```bash
    cd final-evaluation-project-shreyasipanthee
    ```
-3. Make sure you have `Python` installed.
-4. **Install dependencies:**
+
+3. **Install dependencies (requires Python):**  
    ```bash
    pip install pygame
    ```
-5. **Run the game:**
+
+4. **Run the game:**  
    ```bash
-   python main.py
+   python blob_life_game.py
    ```
-6. You will see a 10x10 grid with initial random cell states.
 
 ---
 
-## 🕹️ Controls
-- Click on cells to toggle them between alive and dead (before starting).
-- Press **Spacebar** to start/pause the simulation.
-- Press **C** to clear the board.
-- Press **R** to randomize the grid.
-- Press **ESC** to exit the game.
+## 🌟 Features  
+- 🎨 **Start Page with Animation** — colorful, moving blobs and shapes set the tone!  
+- 🧠 **Tutorial Mode** — walk through the rules with Blobbo, your animated blob guide.  
+- 🎭 **Themed Backgrounds** — choose your favorite visual style!  
+- 🧩 **Templates** — instantly create fun patterns like a ❤️, 🙂, or even the letter **A**!  
+- 🔊 **Mute Button** — toggle background music on any screen.  
+- 🎮 **Game Modes** — Tutorial, Storyline, Simulation, Theme Select, Start Menu.  
 
 ---
 
-## 📘 Developer Documentation:
-- [Planning and Features](docs/PLANNING.md)
-- [Pseudocode](docs/PSEUDOCODE.md)
+## 🕹️ Controls  
+
+| Key/Button     | Action                                  |
+|----------------|------------------------------------------|
+| **Mouse Click**| Toggle blobs on/off (in simulation)      |
+| **Spacebar**   | Start/Pause simulation                   |
+| **R**          | Randomize the grid                       |
+| **Left Arrow** | Reset grid                               |
+| **Right Arrow**| Advance one generation manually          |
+| **1, 2, 3**    | Apply templates (Heart, Smiley, Letter A)|
+| **S (Hold)**   | Speed up generation updates              |
+| **Mute Button**| Toggle background music                  |
+| **Back Button**| Return to the start menu                 |
 
 ---
 
-## 👨‍💻 Credits
-Developed by Shreyasi Panthee  
-Inspired by John Conway’s original Game of Life.  
-Assistance from AI (ChatGPT) was used for ...
+## 📘 Developer Documentation  
+- [Planning and Features](docs/PLANNING.md)  
+- [Pseudocode](docs/PSEUDOCODE.md)  
+
+---
+
+## Sources
+
+### ChatGPT Conversations Used
+1. [Conversation on 2025-06-12: Commenting and event handling help](https://chatgpt.com/share/6851ae22-75ac-800d-bad2-e87ff2ec0c97)
+2. [Conversation on 2025-06-13: Mute button and UI improvements](https://chatgpt.com/share/68519576-06ec-800d-9f48-ce1a3654b6c8)
+
+*Note: These conversations provided coding support and suggestions for this project.*
+
+---
+
+## 👨‍💻 Credits  
+Created by **Shreyasi Panthee**  
+Inspired by **John Conway’s Game of Life**  
+
+
