@@ -3,7 +3,7 @@
 ---
 
 ## 🎮 Overview  
-**Blob Life** is a child-friendly, interactive simulation based on **Conway's Game of Life**, reimagined with colorful blobs, animations, themed backgrounds, sound effects, and a guided tutorial featuring Blobbo the blob. Designed to be intuitive for even a 5-year-old, it's both educational and fun!
+**Blob Life** is a fun, interactive simulation based on **Conway's Game of Life**, reimagined with colorful blobs, animations, themed backgrounds, sound effects, and a guided tutorial featuring Blobbo the blob. Designed to be intuitive for even a 5-year-old, it's both educational and fun!
 
 ---
 
