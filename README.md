@@ -45,7 +45,7 @@ Each square (cell) can either have a **blob** or be **empty**. Every round (gene
 - 🎭 **Themed Backgrounds** — choose your favorite visual style!  
 - 🧩 **Templates** — instantly create fun patterns like a ❤️, 🙂, or even the letter **A**!  
 - 🔊 **Mute Button** — toggle background music on any screen.  
-- 🎮 **Game Modes** — Tutorial, Storyline, Simulation, Theme Select, Start Menu.  
+- 🎮 **Game Screens** — Tutorial, Storyline, Simulation, Theme Select, Start Menu.  
 
 ---
 
@@ -68,21 +68,10 @@ Each square (cell) can either have a **blob** or be **empty**. Every round (gene
 ## 📘 Developer Documentation  
 - [Planning and Features](docs/PLANNING.md)  
 - [Pseudocode](docs/PSEUDOCODE.md)  
-
----
-
-## Sources
-
-### ChatGPT Conversations Used
-1. [Conversation on 2025-06-12: Commenting and event handling help](https://chatgpt.com/share/6851ae22-75ac-800d-bad2-e87ff2ec0c97)
-2. [Conversation on 2025-06-13: Mute button and UI improvements](https://chatgpt.com/share/68519576-06ec-800d-9f48-ce1a3654b6c8)
-
-*Note: These conversations provided coding support and suggestions for this project.*
+- [Sources](docs/SOURCES.md)
 
 ---
 
 ## 👨‍💻 Credits  
 Created by **Shreyasi Panthee**  
 Inspired by **John Conway’s Game of Life**  
-
-
