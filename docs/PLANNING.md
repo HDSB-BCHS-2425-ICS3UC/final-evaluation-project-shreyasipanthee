@@ -1,71 +1,87 @@
-# Blob Life – Final Evaluation Project
+# 🧠 Blob Life – Final Evaluation Project: Planning File
 
-## 🔗 GitHub Repository
-[Click here to view the GitHub repo](https://github.com/HDSB-BCHS-2425-ICS3UC/final-evaluation-project-shreyasipanthee.git)
-
----
-
-## 📘 Project Overview
-This project is an enhanced, fun version of **Conway’s Game of Life** called **Blob Life**, built using **Python** and the **pygame** library.
-
-Blob Life simulates cellular automaton behavior with animated blob-like cells, colorful themes, and interactive gameplay designed to engage users.
+## ✅ Option Chosen
+**Option:** Create an enhanced, fun version of Conway’s Game of Life using Python and Pygame.
 
 ---
 
-## 🎮 Game Rules
-- The core rules of Conway’s Game of Life still apply:
-  - **Underpopulation**: Any live blob with fewer than two live neighbours disappears.
-  - **Overcrowding**: Any live blob with more than three live neighbours disappears.
-  - **Survival**: Any live blob with two or three live neighbours survives.
-  - **Reproduction**: Any dead cell with exactly three live neighbours creates a new blob.
+## 💡 Problem Breakdown – Steps to Solve the Project
+
+### 1. Setup and Grid System
+- Initialize a 10x10 2D list of `Cell` objects.
+- Each `Cell` will store its row/col position, alive state, and display image.
+
+### 2. Cell Class Implementation
+- Add `draw()` and `toggle()` methods.
+- Use animated blob images instead of colored squares.
+- Animate blobs using frame-switching or transitions.
+
+### 3. Conway’s Rules Logic
+- Implement the 4 main rules:
+  - **Underpopulation**: Fewer than 2 neighbors → dies
+  - **Overcrowding**: More than 3 neighbors → dies
+  - **Survival**: 2–3 neighbors → lives
+  - **Reproduction**: Exactly 3 neighbors → becomes alive
+- Ensure boundary-safe neighbor checking.
+
+### 4. User Input and Controls
+- Mouse click to toggle blob state.
+- Keyboard controls:
+  - `Spacebar` – Start/pause simulation
+  - `Left Arrow` – Reset all blobs
+  - `R` – Randomize blobs
+  - `ESC` – Exit the game
+
+### 5. Themes System
+- Add multiple themes that change:
+  - Background color
+  - Blob images
+
+### 6. Templates
+- Create fun preset patterns like:
+  - Heart
+  - Smiley
+  - Letter A
+- Load them with one click.
+
+### 7. Tutorial and Storyline
+- Friendly character "Blobbo" explains the rules.
+- Simple language and visuals for young children.
+- Add a skip button and a back button.
+
+### 8. Audio Features
+- Background music and sound effects.
+- Add a mute/unmute button.
+
+### 9. Navigation and UI
+- Start page with buttons to Play, Tutorial, Templates, etc.
+- Use `current_page` variable to control navigation.
+- Add:
+  - Back button
+  - Generation counter
+  - Progress bar
 
 ---
 
-## 🧠 General Program Breakdown
-- Initialize a **10x10 grid** of animated blob cells.
-- Each blob cell can be **alive (visible, animated)** or **dead (invisible)**.
-- Multiple **colorful themes** change the background and blob colors.
-- Interactive gameplay features:
-  - Click cells to toggle blobs alive/dead before simulation starts.
-  - Keyboard controls for starting, pausing, reseting, randomizing, and exiting.
-  - Templates for preset patterns (like heart, smiley, initials).
-  - Tutorial screens with a friendly character explaining rules.
-- Animated blobs use visuals and smooth transitions.
-- Sound effects and background music enhance user experience.
+## ⚠️ Potential Challenges and Solutions
+
+| Problem | Anticipated Difficulty | Planned Solution |
+|--------|-------------------------|------------------|
+| Blobs not animating correctly | Medium | Use multiple blob frames and cycle with `pygame.time.get_ticks()` |
+| Neighbor count errors at grid edges | High | Create a safe `get_neighbors()` function with bounds checking |
+| Switching between pages | Medium | Use a `current_page` variable and draw different content per state |
+| Game continues 1 more generation after pause | High | Only update grid when `running` is True, ignore if just paused |
+| Reset doesn't clear blobs | Medium | Loop through grid, set `alive = False`, `image = None`, reset gen count |
+| Confusing UI | Medium | Use readable fonts, soft button shapes, clear labels |
+| Audio sync issues | Low | Use `pygame.mixer.music` for BGM |
+| Accessibility for users | High | Use big buttons, simple text, visuals, and help from Blobbo |
 
 ---
 
-## ✨ Features
-- Animated blob visuals replacing simple squares.
-- Multiple colorful themes with matching backgrounds and blobs.
-- User interface elements including a tutorial with Blobbo character.
-- Preset templates to quickly load fun patterns.
-- Responsive controls and smooth simulation updates.
-- Clean, accessible UI for users.
-- Sound and music integration.
-- Grid boundaries handled safely in neighbor counts.
+## 🗂️ Summary of the Full Plan
+
+Blob Life is a friendly, animated simulation game inspired by Conway’s Game of Life, built for kids. It features colorful themes, sound, templates, and a tutorial with a mascot. The project is broken into clear steps: building the logic and cell system first, then UI, animation, audio, templates, and navigation. Key challenges like user-friendly design and safe neighbor logic are addressed in the plan, ensuring a smooth, fun experience.
 
 ---
 
-## 🧱 Program Structure
-- A **2D list** (`grid`) contains `Cell` objects representing blobs.
-- `Cell` class stores:
-  - Position, size, alive state.
-  - Methods for drawing animated blobs and toggling state.
-- Theme system managing colors for backgrounds and blobs.
-- Main game loop:
-  - Handles user input and events.
-  - Updates grid based on Conway’s rules each generation when running.
-  - Draws animated blobs and UI elements.
-- Additional modules or functions for:
-  - Playing sounds and music.
-  - Managing tutorials and storyline screens.
-
----
-
-## 🕹️ Controls Summary
-- **Mouse Click:** Toggle blob alive/dead before simulation starts.
-- **Spacebar:** Start/pause simulation.
-- **Left-arrow:** Reset all blobs to dead.
-- **R:** Randomize blobs.
-- **ESC:** Exit game.
+🔗 [Click here to view the GitHub repository](https://github.com/HDSB-BCHS-2425-ICS3UC/final-evaluation-project-shreyasipanthee.git)
