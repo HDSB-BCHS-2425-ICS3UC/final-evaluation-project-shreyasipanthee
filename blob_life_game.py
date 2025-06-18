@@ -54,8 +54,8 @@ font_2 = pygame.font.Font(None, 28)
 story_lines = [
     "The Blob Life Story",
     "",
-    "Once upon a time, a genius named Conway made",
-    "a grid where life grew using rules, not magic!",
+    "Once upon a time, a genius named John Conway",
+    "made a grid where life grew using rules, not magic!",
     "",
     "Now blobs have taken over in this playful version!",
     "They pop in, disappear, or stay—based on how",
